@@ -102,14 +102,14 @@ services:
       - master
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.nginx
     container_name: decentgpu-nginx
     restart: unless-stopped
     # Only binds to localhost — cloudflared connects here, never public internet
     ports:
       - "127.0.0.1:8080:80"
-    volumes:
-      - ./deploy/nginx.prod.conf:/etc/nginx/nginx.conf:ro
     networks:
       - decentgpu
     depends_on:
