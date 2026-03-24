@@ -147,12 +147,14 @@ pub async fn setup_script_handler(
     let bootstrap_addr = std::env::var("MASTER_BOOTSTRAP_ADDR")
         .ok()
         .or_else(|| std::env::var("MASTER__BOOTSTRAP_ADDR").ok())
-        .unwrap_or_else(|| state.config.bootstrap_addr.clone());
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| state.bootstrap_addr.to_string());
 
     let public_ip = std::env::var("MASTER_PUBLIC_IP")
         .ok()
         .or_else(|| std::env::var("MASTER__PUBLIC_IP").ok())
-        .unwrap_or_else(|| state.config.public_ip.clone());
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| state.public_ip.to_string());
 
     let bootstrap_peer_id = std::env::var("BOOTSTRAP_PEER_ID")
         .unwrap_or_else(|_| "BOOTSTRAP_PEER_ID_NOT_CONFIGURED".to_string());

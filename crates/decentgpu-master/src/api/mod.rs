@@ -55,6 +55,8 @@ pub struct AppState {
     pub binaries_dir: Arc<String>,
     /// Public IP of this master node, used in worker setup scripts.
     pub public_ip: Arc<String>,
+    /// Bootstrap node address, used as default for worker setup scripts.
+    pub bootstrap_addr: Arc<String>,
     /// P2P TCP listen address (e.g. `/ip4/0.0.0.0/tcp/9010`), used to extract
     /// the port when generating the public-facing master P2P address for workers.
     pub p2p_tcp_addr: Arc<String>,
@@ -96,6 +98,7 @@ impl AppState {
             docker_builder,
             binaries_dir:   Arc::new(binaries_dir),
             public_ip:      Arc::new(cfg.public_ip),
+            bootstrap_addr: Arc::new(cfg.bootstrap_addr),
             p2p_tcp_addr:   Arc::new(cfg.p2p_tcp_addr),
         })
     }
