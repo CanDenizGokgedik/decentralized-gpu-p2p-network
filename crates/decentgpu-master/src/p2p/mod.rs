@@ -123,7 +123,11 @@ pub async fn start_with_auth(
     // Use allocate_new_port() so libp2p does NOT try to reuse the master's own
     // listen port (9010) when connecting to the bootstrap (9000). On macOS,
     // port-reuse dialing to a local address causes "Address already in use (os error 48)".
-    let bootstrap_addr: Multiaddr = cfg.bootstrap_addr.parse().context("bootstrap_addr")?;
+    // Prefer MASTER_BOOTSTRAP_ADDR env var (single-underscore) over the config crate field.
+    let bootstrap_addr_str = std::env::var("MASTER_BOOTSTRAP_ADDR")
+        .ok()
+        .unwrap_or_else(|| cfg.bootstrap_addr.clone());
+    let bootstrap_addr: Multiaddr = bootstrap_addr_str.parse().context("bootstrap_addr")?;
     let dial_opts = DialOpts::unknown_peer_id()
         .address(bootstrap_addr.clone())
         .allocate_new_port()

@@ -144,9 +144,15 @@ pub async fn setup_script_handler(
 ) -> Response {
     let token = generate_worker_token(&auth_user, &state);
 
-    let bootstrap_addr = std::env::var("MASTER__BOOTSTRAP_ADDR")
-        .or_else(|_| std::env::var("MASTER_BOOTSTRAP_ADDR"))
-        .unwrap_or_else(|_| "/ip4/127.0.0.1/tcp/9000".to_string());
+    let bootstrap_addr = std::env::var("MASTER_BOOTSTRAP_ADDR")
+        .ok()
+        .or_else(|| std::env::var("MASTER__BOOTSTRAP_ADDR").ok())
+        .unwrap_or_else(|| state.config.bootstrap_addr.clone());
+
+    let public_ip = std::env::var("MASTER_PUBLIC_IP")
+        .ok()
+        .or_else(|| std::env::var("MASTER__PUBLIC_IP").ok())
+        .unwrap_or_else(|| state.config.public_ip.clone());
 
     let bootstrap_peer_id = std::env::var("BOOTSTRAP_PEER_ID")
         .unwrap_or_else(|_| "BOOTSTRAP_PEER_ID_NOT_CONFIGURED".to_string());
@@ -161,7 +167,7 @@ pub async fn setup_script_handler(
         // Production: master is reachable via Cloudflare-tunnelled WebSocket.
         // Allow explicit override, otherwise derive from public_ip.
         std::env::var("WORKER_MASTER_ADDR")
-            .unwrap_or_else(|_| format!("/dns4/ws-master.{}/tcp/443/wss", state.public_ip))
+            .unwrap_or_else(|_| format!("/dns4/ws-master.{}/tcp/443/wss", public_ip))
     } else {
         // Local / TCP mode: extract port from listen addr and use public_ip.
         let p2p_port = state.p2p_tcp_addr
