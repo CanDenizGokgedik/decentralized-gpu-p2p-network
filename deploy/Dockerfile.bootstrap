@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
+COPY .sqlx/ .sqlx/
 
 ENV SQLX_OFFLINE=true
 RUN cargo build --release --bin decentgpu-bootstrap
