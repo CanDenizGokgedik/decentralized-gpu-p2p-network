@@ -98,7 +98,7 @@ function StepIndicator({
 export default function WorkerClientPage() {
   const { user } = useAuth()
   const [platform, setPlatform] = useState<PlatformInfo | null>(null)
-  const [step, setStep] = useState<0 | 1 | 2 | 3>(0)
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(0)
   const [altPlatform, setAltPlatform] = useState(false)
 
   useEffect(() => {
@@ -119,8 +119,8 @@ export default function WorkerClientPage() {
   })
 
   useEffect(() => {
-    if (workerStatus?.is_online && step === 2) {
-      setStep(3)
+    if (workerStatus?.is_online && (step === 2 || step === 3)) {
+      setStep(4)
     }
   }, [workerStatus, step])
 
@@ -207,13 +207,15 @@ export default function WorkerClientPage() {
       {/* Step tracker */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-          <StepIndicator number={1} title="Programı İndir" done={step >= 1} active={step === 0} />
+          <StepIndicator number={1} title="İndir" done={step >= 1} active={step === 0} />
           <ChevronRight className="w-4 h-4 text-slate-700 hidden sm:block shrink-0" />
-          <StepIndicator number={2} title="Scripti Çalıştır" done={step >= 2} active={step === 1} />
+          <StepIndicator number={2} title="Kur" done={step >= 2} active={step === 1} />
           <ChevronRight className="w-4 h-4 text-slate-700 hidden sm:block shrink-0" />
-          <StepIndicator number={3} title="Bağlantı Bekleniyor" done={step >= 3} active={step === 2} />
+          <StepIndicator number={3} title="Çalıştır" done={step >= 3} active={step === 2} />
           <ChevronRight className="w-4 h-4 text-slate-700 hidden sm:block shrink-0" />
-          <StepIndicator number={4} title="Hazır!" done={step >= 3} active={step === 3} />
+          <StepIndicator number={4} title="Bağlan" done={step >= 4} active={step === 3} />
+          <ChevronRight className="w-4 h-4 text-slate-700 hidden sm:block shrink-0" />
+          <StepIndicator number={5} title="Hazır" done={step >= 4} active={step === 4} />
         </div>
       </div>
 
@@ -329,33 +331,60 @@ export default function WorkerClientPage() {
               Kurulum Scriptini İndir
             </button>
 
-            <div className="mt-6 bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-              <p className="text-sm font-medium text-slate-300 mb-3">Script nasıl çalıştırılır?</p>
-              {platform.id.includes('windows') ? (
-                <div className="space-y-3 text-sm text-slate-400">
-                  <p>1. İndirilen <code className="text-indigo-300 bg-slate-900 px-1 rounded">decentgpu-setup.bat</code> ve <code className="text-indigo-300 bg-slate-900 px-1 rounded">{platform.binary}</code> dosyalarını aynı klasöre koyun</p>
-                  <p>2. <code className="text-indigo-300 bg-slate-900 px-1 rounded">decentgpu-setup.bat</code> dosyasına çift tıklayın</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-slate-400">1. İndirilen <code className="text-indigo-300 bg-slate-900 px-1 rounded">decentgpu-setup.sh</code> ve <code className="text-indigo-300 bg-slate-900 px-1 rounded">{platform.binary}</code> dosyalarını aynı klasöre koyun</p>
-                  <p className="text-sm text-slate-400">2. Terminal açın ve çalıştırın:</p>
-                  <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs text-emerald-300 border border-slate-700">
-                    cd ~/Downloads && bash decentgpu-setup.sh
-                  </div>
-                </div>
-              )}
-            </div>
-
             <button onClick={() => setStep(2)} className="w-full mt-4 py-2.5 text-slate-400 hover:text-slate-200 text-sm transition-colors">
-              Scripti çalıştırdım, bağlantı bekliyorum →
+              Zaten indirdim →
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 2 — Waiting for connection */}
+      {/* STEP 2 — Run command instructions */}
       {step === 2 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-slate-800">
+            <h2 className="font-semibold text-slate-100">Adım 3 — Terminalde Çalıştır</h2>
+            <p className="text-sm text-slate-400 mt-1">
+              İndirdiğiniz dosyaların bulunduğu klasöre gidin ve aşağıdaki komutu terminale yapıştırın.
+            </p>
+          </div>
+          <div className="p-6 text-center">
+            <div className="bg-slate-950 rounded-xl p-5 font-mono text-sm text-emerald-400 border border-slate-800 mb-6 text-left relative group">
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <CheckCircle className="w-4 h-4 text-slate-500" />
+              </div>
+              <p className="text-slate-500 mb-2 selection:bg-indigo-500/30"># Terminali açın ve yapıştırın:</p>
+              <code className="block select-all cursor-pointer">
+                cd ~/Downloads && bash decentgpu-setup.sh
+              </code>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6 text-left">
+              <p className="text-xs text-amber-300 flex items-center gap-2 font-medium">
+                <Zap className="w-3.5 h-3.5" />
+                Önemli
+              </p>
+              <p className="text-xs text-amber-200/70 mt-1 leading-relaxed">
+                macOS&apos;ta &quot;Geliştirici doğrulanamadı&quot; uyarısı alırsanız bu script onu otomatik temizleyecektir. 
+                Sadece terminaldeki komutu çalıştırıp beklemeniz yeterlidir.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setStep(3)}
+              className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
+            >
+              Komutu Çalıştırdım, Bağlantı Bekliyorum
+            </button>
+
+            <button onClick={() => setStep(1)} className="block mx-auto mt-4 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              ← Geri dön (Scripti tekrar indir)
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3 — Waiting for connection */}
+      {step === 3 && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Wifi className="w-8 h-8 text-indigo-400 animate-pulse" />
@@ -381,8 +410,8 @@ export default function WorkerClientPage() {
         </div>
       )}
 
-      {/* STEP 3 — Success */}
-      {step === 3 && (
+      {/* STEP 4 — Success */}
+      {step === 4 && (
         <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl overflow-hidden">
           <div className="bg-emerald-500/10 p-6 border-b border-emerald-500/20 text-center">
             <div className="text-4xl mb-2">🎉</div>
