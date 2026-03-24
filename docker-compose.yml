@@ -107,9 +107,7 @@ services:
       dockerfile: deploy/Dockerfile.nginx
     container_name: decentgpu-nginx
     restart: unless-stopped
-    # Only binds to localhost — cloudflared connects here, never public internet
-    ports:
-      - "127.0.0.1:8080:80"
+    # Internal network access only, no host port bindings required.
     networks:
       - decentgpu
     depends_on:
