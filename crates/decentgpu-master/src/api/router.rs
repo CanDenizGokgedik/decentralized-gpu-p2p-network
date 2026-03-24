@@ -6,6 +6,7 @@ use axum::{
     middleware,
     routing::{get, patch, post},
     Json, Router,
+    extract::DefaultBodyLimit,
 };
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
@@ -88,6 +89,7 @@ pub fn build(state: AppState) -> Router {
         .merge(protected)
         .layer(TraceLayer::new_for_http())
         .layer(cors)
+        .layer(DefaultBodyLimit::disable())
         .with_state(state)
 }
 
