@@ -77,6 +77,7 @@ pub fn build(state: AppState) -> Router {
         .route("/api/admin/users/:id/role",              patch(admin::update_user_role))
         .route("/api/admin/stats",                       get(admin::get_stats))
         .route("/api/admin/workers/:peer_id/disconnect", post(admin::disconnect_worker))
+        .route("/api/admin/downloads/worker/:platform",  post(admin::upload_worker_binary))
         .layer(middleware::from_fn_with_state(
             state.clone(),
             auth::jwt_middleware,

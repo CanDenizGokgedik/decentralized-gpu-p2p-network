@@ -244,3 +244,43 @@ pub async fn disconnect_worker(
 
     Ok(Json(serde_json::json!({ "disconnected": peer_id_str })))
 }
+
+/// `POST /api/v1/admin/downloads/worker/:platform`
+pub async fn upload_worker_binary(
+    State(state): State<AppState>,
+    _admin: AdminUser,
+    Path(platform): Path<String>,
+    body: axum::body::Bytes,
+) -> Result<impl IntoResponse, ApiError> {
+    const PLATFORMS: &[&str] = &[
+        "linux-x86_64",
+        "macos-aarch64",
+        "macos-x86_64",
+        "windows-x86_64",
+    ];
+
+    if !PLATFORMS.contains(&platform.as_str()) {
+        return Err(ApiError::bad_request("unsupported platform"));
+    }
+
+    let filename = if platform.starts_with("windows") {
+        "decentgpu-worker.exe"
+    } else {
+        "decentgpu-worker"
+    };
+
+    let dir = std::path::PathBuf::from(state.binaries_dir.as_ref()).join(&*platform);
+    tokio::fs::create_dir_all(&dir)
+        .await
+        .map_err(|e| ApiError::internal(format!("failed to create dir: {e}")))?;
+
+    let file_path = dir.join(filename);
+    tokio::fs::write(&file_path, body)
+        .await
+        .map_err(|e| ApiError::internal(format!("failed to write binary: {e}")))?;
+
+    Ok(Json(serde_json::json!({
+        "status": "success",
+        "platform": platform,
+    })))
+}
