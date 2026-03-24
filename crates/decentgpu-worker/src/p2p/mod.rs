@@ -155,7 +155,21 @@ pub async fn start(
     swarm.add_external_address(external_addr.clone());
     tracing::info!(addr = %external_addr, "added initial external address for rendezvous");
 
-    let bootstrap_addr: Multiaddr = cfg.bootstrap_addr.parse().context("bootstrap_addr")?;
+    let bootstrap_addr_str = std::env::var("WORKER_BOOTSTRAP_ADDR")
+        .ok()
+        .or_else(|| std::env::var("WORKER__BOOTSTRAP_ADDR").ok())
+        .unwrap_or_else(|| cfg.bootstrap_addr.clone());
+    let bootstrap_addr: Multiaddr = bootstrap_addr_str.parse().context("bootstrap_addr")?;
+
+    // Also pick up BOOTSTRAP_PEER_ID from env if present.
+    let bootstrap_peer_id = std::env::var("BOOTSTRAP_PEER_ID")
+        .ok()
+        .or_else(|| std::env::var("WORKER__BOOTSTRAP_PEER_ID").ok())
+        .or_else(|| std::env::var("WORKER_BOOTSTRAP_PEER_ID").ok());
+    if let Some(id) = bootstrap_peer_id {
+        tracing::info!(peer_id = %id, "using bootstrap peer_id from environment");
+    }
+
     swarm.dial(bootstrap_addr.clone()).context("dial bootstrap")?;
 
     let (job_tx, job_rx) = mpsc::channel::<decentgpu_proto::JobAssignment>(32);
