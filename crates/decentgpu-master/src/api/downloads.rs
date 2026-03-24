@@ -163,10 +163,18 @@ pub async fn setup_script_handler(
     let is_prod_domain = public_ip.contains(".me") || public_ip.contains(".com") || public_ip.contains(".net");
 
     let (worker_bootstrap_addr, master_p2p_addr) = if is_prod_domain {
+        // If public_ip is "gpu.example.com", base_domain should be "example.com"
+        // for "ws-master.example.com" to work correctly with common tunnel setups.
+        let base_domain = if public_ip.starts_with("gpu.") {
+            public_ip.strip_prefix("gpu.").unwrap_or(&public_ip)
+        } else {
+            &public_ip
+        };
+
         // Production: workers connect via Cloudflare-tunnelled WebSockets.
         (
-            format!("/dns4/ws-bootstrap.{}/tcp/443/wss", public_ip),
-            format!("/dns4/ws-master.{}/tcp/443/wss", public_ip)
+            format!("/dns4/ws-bootstrap.{}/tcp/443/wss", base_domain),
+            format!("/dns4/ws-master.{}/tcp/443/wss", base_domain)
         )
     } else {
         // Local / TCP mode: calculate TCP address.
