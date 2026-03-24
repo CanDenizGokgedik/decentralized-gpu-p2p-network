@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package decentgpu;
+
+enum GpuBackend {
+    CPU_ONLY = 0;
+    CUDA = 1;
+    METAL = 2;
+    ROCM = 3;
+}
+
+enum LogLevel {
+    STDOUT = 0;
+    STDERR = 1;
+    SYSTEM = 2;
+}
+
+message GpuInfo {
+    string name = 1;
+    uint64 vram_mb = 2;
+    GpuBackend backend = 3;
+}
+
+message CpuInfo {
+    string model = 1;
+    uint32 cores = 2;
+    uint32 threads = 3;
+    uint64 freq_mhz = 4;
+}
+
+message WorkerCapabilities {
+    string peer_id = 1;
+    repeated GpuInfo gpus = 2;
+    CpuInfo cpu = 3;
+    uint64 ram_mb = 4;
+    uint64 disk_mb = 5;
+    string os = 6;
+    string worker_version = 7;
+}
+
+message JobSpec {
+    string job_id = 1;
+    string hirer_id = 2;
+    uint64 max_duration_secs = 3;
+    uint64 memory_limit_mb = 4;
+    uint64 cpu_limit_percent = 5;
+    GpuBackend required_backend = 6;
+    string image_hash = 7;
+    uint64 image_size_bytes = 8;
+    // Inline code payload sent by master so the worker does not need a separate download.
+    bytes code_bytes = 9;
+    bytes requirements_bytes = 10;
+}
+
+message JobAssignment {
+    JobSpec spec = 1;
+    string master_peer_id = 2;
+}
+
+message JobAccepted {
+    string job_id = 1;
+}
+
+message JobRejected {
+    string job_id = 1;
+    string reason = 2;
+}
+
+message LogLine {
+    string job_id = 1;
+    int64 timestamp_ms = 2;
+    LogLevel level = 3;
+    string message = 4;
+}
+
+message TransferChunk {
+    string transfer_id = 1;
+    uint64 offset = 2;
+    bytes data = 3;
+    bool is_last = 4;
+    string sha256 = 5;
+}
+
+message TransferAck {
+    string transfer_id = 1;
+    uint64 offset = 2;
+    bool ok = 3;
+}
+
+message JobCompleted {
+    string job_id = 1;
+    bool success = 2;
+    string error_message = 3;
+    uint64 duration_secs = 4;
+    uint64 result_size_bytes = 5;
+    // Full stdout/stderr output of the job, used for terminal log replay.
+    string output = 6;
+}
+
+message HeartBeat {
+    string peer_id = 1;
+    float uptime_percent = 2;
+    bool is_busy = 3;
+    uint64 jobs_completed = 4;
+}
+
+// Unified job assignment acknowledgement (request-response reply).
+message JobAck {
+    string job_id = 1;
+    bool accepted = 2;
+    string reason = 3;
+}
+
+// Sent by a worker to the master to register and link to a user account.
+message RegisterWorker {
+    string peer_id = 1;
+    string jwt_token = 2;
+    WorkerCapabilities capabilities = 3;
+}
+
+// Sent by the master back to the worker acknowledging registration.
+message RegisterWorkerAck {
+    bool   success = 1;
+    string error   = 2;
+    string user_id = 3;
+}
+
+// Envelope for framing messages on P2P streams
+message Envelope {
+    oneof payload {
+        WorkerCapabilities worker_capabilities = 1;
+        JobAssignment job_assignment = 2;
+        JobAccepted job_accepted = 3;
+        JobRejected job_rejected = 4;
+        LogLine log_line = 5;
+        TransferChunk transfer_chunk = 6;
+        TransferAck transfer_ack = 7;
+        JobCompleted job_completed = 8;
+        HeartBeat heart_beat = 9;
+        RegisterWorker register_worker = 10;
+        RegisterWorkerAck register_worker_ack = 11;
+    }
+}

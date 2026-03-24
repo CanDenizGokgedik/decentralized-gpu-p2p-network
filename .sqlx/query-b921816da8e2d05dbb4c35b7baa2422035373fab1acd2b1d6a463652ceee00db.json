@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT timestamp_ms, level, message\n               FROM job_logs\n               WHERE job_id = $1 AND timestamp_ms > $2\n               ORDER BY timestamp_ms ASC\n               LIMIT $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "timestamp_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "level",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "message",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b921816da8e2d05dbb4c35b7baa2422035373fab1acd2b1d6a463652ceee00db"
+}

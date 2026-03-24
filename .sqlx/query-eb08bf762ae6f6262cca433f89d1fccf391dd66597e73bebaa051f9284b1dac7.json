@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE workers SET uptime_score = $1 WHERE peer_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eb08bf762ae6f6262cca433f89d1fccf391dd66597e73bebaa051f9284b1dac7"
+}

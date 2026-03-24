@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO workers (peer_id, user_id, capabilities, is_online, last_seen)\n               VALUES ($1, $2, $3, true, now())\n               ON CONFLICT (peer_id) DO UPDATE\n                 SET capabilities = EXCLUDED.capabilities,\n                     is_online = true,\n                     last_seen = now()",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fb9232ed1ba5395bef39de5466752f4f2ab806e0a592b65d05036ca9690ec54a"
+}

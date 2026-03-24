@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO jobs\n                 (hirer_id, gpu_backend, memory_limit_mb, max_duration_secs, cu_price)\n               VALUES ($1, $2, $3, $4, $5)\n               RETURNING\n                 id, hirer_id, worker_peer_id, status, gpu_backend,\n                 memory_limit_mb, max_duration_secs, cu_price,\n                 created_at, assigned_at, started_at, finished_at,\n                 error_message, result_path",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "hirer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "worker_peer_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "gpu_backend",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "memory_limit_mb",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "max_duration_secs",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "cu_price",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "assigned_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "finished_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "error_message",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "result_path",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "f8a7de075f8ec8791b7f53d6494931d0c97e10f4449d323d0ec8f2dbad6dec02"
+}

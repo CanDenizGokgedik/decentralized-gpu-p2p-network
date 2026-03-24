@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE workers SET jobs_completed = jobs_completed + 1 WHERE peer_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4635445901d89f096188026c9f5411cd8e0ddbb0bd2efd933b12e9a67aa46476"
+}

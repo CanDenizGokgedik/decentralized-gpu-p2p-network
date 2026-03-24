@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                 COALESCE(\n                   SUM(\n                     EXTRACT(EPOCH FROM (\n                       COALESCE(disconnected_at, now()) - connected_at\n                     ))\n                   ), 0\n                 )::float8 AS connected_seconds\n               FROM worker_sessions\n               WHERE peer_id = $1\n                 AND connected_at > now() - INTERVAL '30 days'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "connected_seconds",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "f0c8cb6950eb43e40fc6b5c2208d1e2e25c49d88a84075d804442843d1144a9e"
+}

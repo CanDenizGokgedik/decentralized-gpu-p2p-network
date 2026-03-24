@@ -1,0 +1,17 @@
+[target.x86_64-unknown-linux-musl]
+linker = "x86_64-linux-musl-gcc"
+
+[target.aarch64-apple-darwin]
+# uses default apple linker
+
+[target.x86_64-apple-darwin]
+# uses default apple linker
+
+[target.x86_64-pc-windows-msvc]
+# uses MSVC linker
+
+[build]
+rustflags = ["-C", "target-cpu=native"]
+
+[env]
+SQLX_OFFLINE = "true"

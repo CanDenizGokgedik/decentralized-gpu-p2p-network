@@ -1,0 +1,43 @@
+[package]
+name = "decentgpu-worker"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "decentgpu-worker"
+path = "src/main.rs"
+
+[dependencies]
+decentgpu-common = { path = "../decentgpu-common" }
+decentgpu-proto = { path = "../decentgpu-proto" }
+
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+libp2p = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+prost = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+futures = { workspace = true }
+bytes = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+async-trait = { workspace = true }
+bollard = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+rand = { workspace = true }
+tar = "0.4"
+
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.27", features = ["net", "user"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.52", features = [
+    "Win32_System_Wmi",
+    "Win32_System_Com",
+    "Win32_System_Ole",
+] }

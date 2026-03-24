@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO compute_unit_transactions (user_id, cu_amount, tx_type, job_id) VALUES ($1, $2, 'job_debit', $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b55aa773a573161f616a79a060aba1df7e615330cd0b38f87dbb814284c93013"
+}

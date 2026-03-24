@@ -1,0 +1,51 @@
+[package]
+name = "decentgpu-master"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "decentgpu-master"
+path = "src/main.rs"
+
+[lib]
+name = "decentgpu_master"
+path = "src/lib.rs"
+
+[dependencies]
+decentgpu-common = { path = "../decentgpu-common" }
+decentgpu-proto = { path = "../decentgpu-proto" }
+
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+libp2p = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+prost = { workspace = true }
+sqlx = { workspace = true }
+jsonwebtoken = { workspace = true }
+argon2 = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+futures = { workspace = true }
+bytes = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+base64 = { workspace = true }
+rand = { workspace = true }
+socketioxide = { workspace = true }
+async-trait = { workspace = true }
+tokio-util = { workspace = true }
+dashmap = { workspace = true }
+bollard = { workspace = true }
+tar = "0.4.45"
+dotenvy = "0.15"
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,143 @@
+# DecentGPU — Production Docker Compose
+#
+# Architecture: Everything behind Cloudflare Tunnel (zero exposed ports on VPS)
+#
+# Cloudflare Tunnel routes (configure in Zero Trust dashboard):
+#   gpu.candeniz.me              → http://nginx:8080       (frontend + API)
+#   ws-bootstrap.gpu.candeniz.me → http://bootstrap:9002  (P2P WebSocket)
+#   ws-master.gpu.candeniz.me    → http://master:9012      (P2P WebSocket)
+#
+# Worker production env:
+#   WORKER_BOOTSTRAP_ADDR=/dns4/ws-bootstrap.gpu.candeniz.me/tcp/443/wss
+#   WORKER_MASTER_ADDR=/dns4/ws-master.gpu.candeniz.me/tcp/443/wss
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: decentgpu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-decentgpu}
+      POSTGRES_USER:     ${POSTGRES_USER:-decentgpu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-decentgpu}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bootstrap:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.bootstrap
+    container_name: decentgpu-bootstrap
+    restart: unless-stopped
+    # NO directly exposed ports — P2P WebSocket served on :9002 internally
+    environment:
+      BOOTSTRAP_PORT:         9000
+      BOOTSTRAP_WS_PORT:      9002
+      BOOTSTRAP_KEYPAIR_PATH: /data/bootstrap.keypair
+      RUST_LOG:               decentgpu_bootstrap=info,libp2p=warn
+    volumes:
+      - bootstrap_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  master:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.master
+    container_name: decentgpu-master
+    restart: unless-stopped
+    # NO directly exposed ports — API on :8888 and P2P WebSocket on :9012 internally
+    environment:
+      DATABASE_URL:             postgres://${POSTGRES_USER:-decentgpu}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-decentgpu}
+      MASTER_API_ADDR:          0.0.0.0:8888
+      MASTER_P2P_TCP_ADDR:      /ip4/0.0.0.0/tcp/9010
+      MASTER_WS_PORT:           9012
+      MASTER_BOOTSTRAP_ADDR:    /dns4/ws-bootstrap.gpu.candeniz.me/tcp/443/wss
+      MASTER_BOOTSTRAP_PEER_ID: ${BOOTSTRAP_PEER_ID}
+      MASTER_KEYPAIR_PATH:      /data/master.keypair
+      MASTER_PUBLIC_IP:         gpu.candeniz.me
+      MASTER__JWT_SECRET:       ${JWT_SECRET}
+      ADMIN_EMAIL:              ${ADMIN_EMAIL}
+      ADMIN_PASSWORD:           ${ADMIN_PASSWORD}
+      MASTER__STORAGE_PATH:     /data/job-files
+      SQLX_OFFLINE:             "true"
+      RUST_LOG:                 decentgpu_master=info,libp2p=warn
+    volumes:
+      - master_data:/data
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      bootstrap:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../deploy/Dockerfile.frontend
+      args:
+        NEXT_PUBLIC_API_URL: https://gpu.candeniz.me
+        NEXT_PUBLIC_WS_URL:  wss://gpu.candeniz.me
+    container_name: decentgpu-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: https://gpu.candeniz.me
+      NEXT_PUBLIC_WS_URL:  wss://gpu.candeniz.me
+      NODE_ENV:            production
+    networks:
+      - internal
+    depends_on:
+      - master
+
+  nginx:
+    image: nginx:alpine
+    container_name: decentgpu-nginx
+    restart: unless-stopped
+    # Only binds to localhost — cloudflared connects here, never public internet
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - internal
+    depends_on:
+      - frontend
+      - master
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: decentgpu-cloudflared
+    restart: unless-stopped
+    # Token-based: configure ingress rules in Cloudflare Zero Trust dashboard
+    # Route gpu.candeniz.me              → http://nginx:8080
+    # Route ws-bootstrap.gpu.candeniz.me → http://bootstrap:9002
+    # Route ws-master.gpu.candeniz.me    → http://master:9012
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - internal
+    depends_on:
+      - nginx
+      - bootstrap
+      - master
+
+volumes:
+  postgres_data:
+  bootstrap_data:
+  master_data:
+
+networks:
+  internal:
+    driver: bridge

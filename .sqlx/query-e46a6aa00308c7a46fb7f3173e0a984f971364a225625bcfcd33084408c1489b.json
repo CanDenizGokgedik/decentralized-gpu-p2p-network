@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, cu_amount, tx_type, job_id, created_at\n               FROM compute_unit_transactions\n               WHERE user_id = $1\n               ORDER BY created_at DESC\n               LIMIT 50",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "cu_amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tx_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "job_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "e46a6aa00308c7a46fb7f3173e0a984f971364a225625bcfcd33084408c1489b"
+}

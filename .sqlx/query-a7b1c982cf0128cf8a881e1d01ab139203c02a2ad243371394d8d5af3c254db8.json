@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE workers SET is_online = false",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "a7b1c982cf0128cf8a881e1d01ab139203c02a2ad243371394d8d5af3c254db8"
+}

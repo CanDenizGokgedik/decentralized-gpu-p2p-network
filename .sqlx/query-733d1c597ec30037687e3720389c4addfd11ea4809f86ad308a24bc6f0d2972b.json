@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT cu_balance, cu_reserved FROM compute_unit_balances WHERE user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "cu_balance",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "cu_reserved",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "733d1c597ec30037687e3720389c4addfd11ea4809f86ad308a24bc6f0d2972b"
+}

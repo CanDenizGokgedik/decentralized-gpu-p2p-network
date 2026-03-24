@@ -1,0 +1,105 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE jobs SET\n                 status         = $1,\n                 worker_peer_id = COALESCE($2, worker_peer_id),\n                 error_message  = COALESCE($3, error_message),\n                 result_path    = COALESCE($4, result_path),\n                 assigned_at = CASE WHEN $1 = 'assigned'  THEN now() ELSE assigned_at END,\n                 started_at  = CASE WHEN $1 = 'running'   THEN now() ELSE started_at  END,\n                 finished_at = CASE WHEN $1 IN ('completed','failed','cancelled')\n                                    THEN now() ELSE finished_at END\n               WHERE id = $5 AND status = $6\n               RETURNING\n                 id, hirer_id, worker_peer_id, status, gpu_backend,\n                 memory_limit_mb, max_duration_secs, cu_price,\n                 created_at, assigned_at, started_at, finished_at,\n                 error_message, result_path",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "hirer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "worker_peer_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "gpu_backend",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "memory_limit_mb",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "max_duration_secs",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "cu_price",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "assigned_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "finished_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "error_message",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "result_path",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "a4feaf7c99b356fac8dfd5953b5c31222d906f58be541db34279580be04eb937"
+}

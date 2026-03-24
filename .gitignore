@@ -1,0 +1,51 @@
+# Rust
+target/
+*.pem
+*.key
+
+# Environment — NEVER commit real secrets
+.env
+.env.local
+.env.production
+.env*.local
+*.env
+# but NOT .env.example — that's safe to commit
+
+# Keypairs
+*.keypair
+bootstrap.keypair
+master.keypair
+worker.keypair
+
+# Binaries and job data
+binaries/
+*.tar
+*.tar.gz
+job-files/
+workspace/
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Logs
+*.log
+/tmp/
+nohup.out
+
+# Docker
+*.pid
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Database
+*.sql.bak
+
+# but NOT .sqlx/ — query metadata must be committed

@@ -1,0 +1,21 @@
+[package]
+name = "decentgpu-bootstrap"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "decentgpu-bootstrap"
+path = "src/main.rs"
+
+[dependencies]
+decentgpu-common = { path = "../decentgpu-common" }
+
+tokio = { workspace = true }
+libp2p = { workspace = true }
+axum = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }

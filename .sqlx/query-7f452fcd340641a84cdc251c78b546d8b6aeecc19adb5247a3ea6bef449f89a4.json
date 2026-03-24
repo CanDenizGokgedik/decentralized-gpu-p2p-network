@@ -1,0 +1,62 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT peer_id, user_id, capabilities,\n                      uptime_score, jobs_completed, is_online,\n                      last_seen, registered_at\n               FROM workers\n               ORDER BY is_online DESC, uptime_score DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "peer_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "capabilities",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "uptime_score",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "jobs_completed",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "is_online",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_seen",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "registered_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "7f452fcd340641a84cdc251c78b546d8b6aeecc19adb5247a3ea6bef449f89a4"
+}
