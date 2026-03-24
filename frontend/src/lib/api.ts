@@ -108,6 +108,11 @@ export const adminApi = {
     api.patch(`/api/admin/users/${id}/role`, { role }),
   disconnectWorker: (peerId: string) =>
     api.post(`/api/admin/workers/${peerId}/disconnect`),
+  uploadWorkerBinary: (platform: string, file: File) => {
+    return api.post(`/api/admin/downloads/worker/${platform}`, file, {
+      headers: { 'Content-Type': 'application/octet-stream' }
+    })
+  },
 }
 
 // ── Downloads ─────────────────────────────────────────────────────────────────

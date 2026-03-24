@@ -216,7 +216,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <a href="/admin/users" className="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl p-5 transition-all group flex items-center justify-between">
           <div>
             <p className="font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors">Kullanıcı Yönetimi</p>
@@ -232,6 +232,81 @@ export default function AdminDashboardPage() {
           <Zap className="w-5 h-5 text-slate-600 group-hover:text-emerald-400 transition-colors" />
         </a>
       </div>
+
+      <BinaryManagement />
     </div>
   )
 }
+
+function BinaryManagement() {
+  const [uploading, setUploading] = React.useState<Record<string, boolean>>({})
+  const platforms = [
+    { id: 'linux-x86_64', label: 'Linux (x86_64)', icon: Activity },
+    { id: 'macos-aarch64', label: 'macOS (Apple Silicon)', icon: Cpu },
+    { id: 'macos-x86_64', label: 'macOS (Intel)', icon: Cpu },
+    { id: 'windows-x86_64', label: 'Windows (x86_64)', icon: Briefcase },
+  ]
+
+  const handleUpload = async (platform: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(prev => ({ ...prev, [platform]: true }))
+    try {
+      await adminApi.uploadWorkerBinary(platform, file)
+      alert(`${platform} için binary başarıyla yüklendi!`)
+    } catch (err: any) {
+      alert(`Yükleme hatası: ${err.response?.data?.error || err.message}`)
+    } finally {
+      setUploading(prev => ({ ...prev, [platform]: false }))
+      e.target.value = ''
+    }
+  }
+
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+      <h2 className="font-semibold text-slate-200 mb-1">İşçi Yazılım Yönetimi</h2>
+      <p className="text-xs text-slate-500 mb-6">Farklı platformlar için derlenmiş worker binary dosyalarını sunucuya yükle</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {platforms.map((p) => (
+          <div key={p.id} className="p-4 bg-slate-950 border border-slate-800 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center">
+                <p.icon className="w-4 h-4 text-slate-400" />
+              </div>
+              <span className="text-xs font-medium text-slate-300">{p.label}</span>
+            </div>
+            
+            <label className={`
+              flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-medium transition-all cursor-pointer
+              ${uploading[p.id] 
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/10'}
+            `}>
+              {uploading[p.id] ? (
+                <>
+                  <Activity className="w-3 h-3 animate-spin" />
+                  Yükleniyor...
+                </>
+              ) : (
+                <>
+                  <Zap className="w-3 h-3" />
+                  Dosya Yükle
+                </>
+              )}
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={(e) => handleUpload(p.id, e)} 
+                disabled={uploading[p.id]}
+              />
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+import React from 'react'

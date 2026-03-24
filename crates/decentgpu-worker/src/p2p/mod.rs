@@ -17,6 +17,9 @@ async fn build_swarm(keypair: identity::Keypair) -> Result<Swarm<WorkerBehaviour
     let local_peer_id = libp2p::PeerId::from(keypair.public());
     let swarm = libp2p::SwarmBuilder::with_existing_identity(keypair.clone())
         .with_tokio()
+        .with_dns()
+        .await
+        .context("DNS transport")?
         .with_tcp(
             tcp::Config::default().nodelay(true),
             noise::Config::new,

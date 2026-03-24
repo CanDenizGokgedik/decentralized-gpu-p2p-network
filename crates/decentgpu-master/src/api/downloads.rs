@@ -151,9 +151,11 @@ pub async fn setup_script_handler(
     let bootstrap_peer_id = std::env::var("BOOTSTRAP_PEER_ID")
         .unwrap_or_else(|_| "BOOTSTRAP_PEER_ID_NOT_CONFIGURED".to_string());
 
-    // Detect production WSS mode: bootstrap addr uses /dns4/ or /wss.
+    // Detect production WSS mode: bootstrap addr uses /dns4/, /wss or custom domain.
     // In WSS mode workers must connect via WebSocket tunnel, not raw TCP.
-    let is_wss = bootstrap_addr.contains("/wss") || bootstrap_addr.contains("/dns4/");
+    let is_wss = bootstrap_addr.contains("/wss") || 
+                 bootstrap_addr.contains("/dns4/") || 
+                 bootstrap_addr.contains(".me");
 
     let master_p2p_addr = if is_wss {
         // Production: master is reachable via Cloudflare-tunnelled WebSocket.
