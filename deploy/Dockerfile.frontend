@@ -1,50 +1,24 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-
 COPY package.json package-lock.json* ./
 RUN npm ci
-
 COPY . .
-
 ARG NEXT_PUBLIC_API_URL=https://gpu.candeniz.me
 ARG NEXT_PUBLIC_WS_URL=wss://gpu.candeniz.me
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Enable standalone output for minimal Docker image
-RUN node -e "
-const fs = require('fs');
-const src = fs.readFileSync('next.config.js', 'utf8');
-if (!src.includes('standalone')) {
-  const patched = src.replace(
-    'module.exports =',
-    'module.exports = /* patched */'
-  ).replace(
-    /module\.exports\s*=\s*\{/,
-    'module.exports = { output: \"standalone\","
-  );
-  fs.writeFileSync('next.config.js', patched);
-  console.log('next.config.js patched for standalone output');
-}
-" 2>/dev/null || echo "next.config.js patch skipped"
-
 RUN npm run build
 
-# ── Runtime ──────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
-
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000 HOSTNAME=0.0.0.0
