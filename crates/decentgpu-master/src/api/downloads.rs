@@ -157,25 +157,26 @@ pub async fn setup_script_handler(
     let bootstrap_peer_id = std::env::var("BOOTSTRAP_PEER_ID")
         .unwrap_or_else(|_| "BOOTSTRAP_PEER_ID_NOT_CONFIGURED".to_string());
 
-    // Detect production WSS mode: bootstrap addr uses /dns4/, /wss or custom domain.
-    // In WSS mode workers must connect via WebSocket tunnel, not raw TCP.
-    let is_wss = bootstrap_addr.contains("/wss") || 
-                 bootstrap_addr.contains("/dns4/") || 
-                 bootstrap_addr.contains(".me");
+    // Detect production context: if public_ip is a domain, force WSS for workers.
+    let is_prod_domain = public_ip.contains(".me") || public_ip.contains(".com") || public_ip.contains(".net");
 
-    let master_p2p_addr = if is_wss {
-        // Production: master is reachable via Cloudflare-tunnelled WebSocket.
-        // Allow explicit override, otherwise derive from public_ip.
-        std::env::var("WORKER_MASTER_ADDR")
-            .unwrap_or_else(|_| format!("/dns4/ws-master.{}/tcp/443/wss", public_ip))
+    let (worker_bootstrap_addr, master_p2p_addr) = if is_prod_domain {
+        // Production: workers connect via Cloudflare-tunnelled WebSockets.
+        (
+            format!("/dns4/ws-bootstrap.{}/tcp/443/wss", public_ip),
+            format!("/dns4/ws-master.{}/tcp/443/wss", public_ip)
+        )
     } else {
-        // Local / TCP mode: extract port from listen addr and use public_ip.
+        // Local / TCP mode: calculate TCP address.
         let p2p_port = state.p2p_tcp_addr
             .split('/')
             .last()
             .and_then(|s| s.parse::<u16>().ok())
             .unwrap_or(9010);
-        format!("/ip4/{}/tcp/{}", state.public_ip, p2p_port)
+        (
+            bootstrap_addr.clone(),
+            format!("/ip4/{}/tcp/{}", public_ip, p2p_port)
+        )
     };
 
     let (script, filename, content_type) = match platform.as_str() {
@@ -223,7 +224,7 @@ echo ""
 "#,
                 binary_name = binary_name,
                 token = token,
-                bootstrap_addr = bootstrap_addr,
+                bootstrap_addr = worker_bootstrap_addr,
                 bootstrap_peer_id = bootstrap_peer_id,
                 master_p2p_addr = master_p2p_addr,
             );
