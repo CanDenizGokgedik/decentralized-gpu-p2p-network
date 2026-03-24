@@ -15,28 +15,26 @@ use behaviour::WorkerBehaviour;
 
 async fn build_swarm(keypair: identity::Keypair) -> Result<Swarm<WorkerBehaviour>> {
     let local_peer_id = libp2p::PeerId::from(keypair.public());
+
     let swarm = libp2p::SwarmBuilder::with_existing_identity(keypair.clone())
         .with_tokio()
-        .with_dns()
-        .await
-        .context("DNS transport")?
         .with_tcp(
             tcp::Config::default().nodelay(true),
             noise::Config::new,
             yamux::Config::default,
-        )
-        .context("TCP transport")?
+        )?
+        .with_dns()?
         .with_websocket(noise::Config::new, yamux::Config::default)
-        .await
-        .context("WebSocket transport")?
-        .with_relay_client(noise::Config::new, yamux::Config::default)
-        .context("relay client")?
-        .with_behaviour(|key, relay_client| WorkerBehaviour::new(local_peer_id, key, relay_client))
-        .map_err(|e| anyhow::anyhow!("behaviour: {e}"))?
-        // Keep connections alive for 2 hours so the master connection is not dropped
-        // after a RegisterWorker or JobCompleted RR exchange (BUG 2 / BUG 4).
-        .with_swarm_config(|c| c.with_idle_connection_timeout(Duration::from_secs(7200)))
+        .await?
+        .with_relay_client(noise::Config::new, yamux::Config::default)?
+        .with_behaviour(|key, relay_client| {
+            WorkerBehaviour::new(local_peer_id, key, relay_client)
+        })?
+        .with_swarm_config(|config: libp2p::swarm::Config| {
+            config.with_idle_connection_timeout(Duration::from_secs(7200))
+        })
         .build();
+
     Ok(swarm)
 }
 
@@ -60,7 +58,7 @@ fn extract_port_from_multiaddr(addr: &str) -> Option<u16> {
     // Split on '/' and look for a numeric component after tcp or udp
     let parts: Vec<&str> = addr.split('/').collect();
     for (i, part) in parts.iter().enumerate() {
-        if (*part == "tcp" || *part == "udp") {
+        if *part == "tcp" || *part == "udp" {
             if let Some(port_str) = parts.get(i + 1) {
                 if let Ok(port) = port_str.parse::<u16>() {
                     return Some(port);

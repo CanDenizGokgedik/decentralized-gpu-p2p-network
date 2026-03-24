@@ -38,6 +38,8 @@ libp2p = { version = "0.54", features = [
     "request-response",
     "macros",
     "dns",
+    "websocket",
+    "tls",
 ] }
 tokio-util = { version = "0.7", features = ["compat", "io"] }
 dashmap = "6"
