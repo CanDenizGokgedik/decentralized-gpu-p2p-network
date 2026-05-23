@@ -1,3 +1,4 @@
+<img width="900" height="887" alt="8c58498d8de26d85153bad6218cb8709" src="https://github.com/user-attachments/assets/6de31e98-724b-48fb-bcc5-da2e8de79bdc" />
 # DecentGPU
 
 > Decentralized GPU Rental Platform · Merkeziyetsiz GPU Kiralama Platformu
