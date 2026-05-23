@@ -189,7 +189,7 @@ Cost = Duration (hours) × 10 CU × GPU Factor
 ### İçindekiler
 - [Nedir?](#nedir)
 - [Nasıl Çalışır?](#nasıl-çalışır)
-- [Teknoloji Yığını](#teknoloji-yığını)
+- [Kullanılan Teknolojiler](#teknoloji-yığını)
 - [Kurulum ve Çalıştırma](#kurulum-ve-çalıştırma)
 - [Proje Yapısı](#proje-yapısı)
 - [Compute Units (CU)](#compute-units-cu-1)
@@ -227,7 +227,7 @@ Hirer → [Web UI / API] → Master Node → Scheduler → Worker Node
 
 ---
 
-### Teknoloji Yığını
+### Kullanılan Teknolojiler
 
 | Katman | Teknoloji |
 |--------|-----------|
