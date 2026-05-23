@@ -5,7 +5,14 @@
 ---
 
 <img width="250" height="240" alt="tubitak" src="https://github.com/user-attachments/assets/b7eb4dfe-f433-4ea7-99ae-412de5b9e086" />
-
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/b7eb4dfe-f433-4ea7-99ae-412de5b9e086" width="250" alt="TÜBİTAK Logo" />
+  
+  <p>
+    Bu proje TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Desteği kapsamında desteklenmektedir.<br>
+    <em>This project is supported by TÜBİTAK 2209-A Undergraduate Research Projects Support Programme.</em>
+  </p>
+</div>
 
 **🇬🇧 [English](#english)** · **🇹🇷 [Türkçe](#türkçe)**
 
