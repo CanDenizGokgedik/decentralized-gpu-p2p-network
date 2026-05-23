@@ -91,7 +91,7 @@ Hirer → [Web UI / API] → Master Node → Scheduler → Worker Node
 
 ```bash
 # Clone the repo
-git clone <repo-url>
+git clone https://github.com/CanDenizGokgedik/decentralized-gpu-p2p-network
 cd decentgpu
 
 # Set up environment variables
@@ -256,7 +256,7 @@ Hirer → [Web UI / API] → Master Node → Scheduler → Worker Node
 
 ```bash
 # Repoyu klonla
-git clone <repo-url>
+git clone https://github.com/CanDenizGokgedik/decentralized-gpu-p2p-network
 cd decentgpu
 
 # .env dosyasını oluştur
