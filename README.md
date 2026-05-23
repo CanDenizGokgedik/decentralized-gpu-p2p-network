@@ -4,6 +4,9 @@
 
 ---
 
+<img width="250" height="240" alt="tubitak" src="https://github.com/user-attachments/assets/b7eb4dfe-f433-4ea7-99ae-412de5b9e086" />
+
+
 **🇬🇧 [English](#english)** · **🇹🇷 [Türkçe](#türkçe)**
 
 ---
@@ -21,7 +24,6 @@
 
 ---
 
-<img width="300" height="293" alt="8c58498d8de26d85153bad6218cb8709" src="https://github.com/user-attachments/assets/6de31e98-724b-48fb-bcc5-da2e8de79bdc" />
 
 ### What is it?
 
